@@ -137,13 +137,11 @@ class UserController {
     } catch (err) {
       console.error("Error:", err);
       if (err instanceof ValidationError) {
-        res
-          .status(422)
-          .json({
-            success: false,
-            message: "Validation failed",
-            fails: err.errors,
-          });
+        res.status(422).json({
+          success: false,
+          message: "Validation failed",
+          fails: err.errors,
+        });
       } else {
         res
           .status(500)
@@ -153,9 +151,32 @@ class UserController {
   }
 
   async getUsers(req, res) {
+    const { page = 1, count = 10 } = req.query;
+    const offset = (page - 1) * count;
+
     try {
-      const result = await pool.query("SELECT * FROM users");
-      res.json(result.rows);
+      const totalUsersResult = await pool.query("SELECT COUNT(*) FROM users");
+      const totalUsers = parseInt(totalUsersResult.rows[0].count, 10);
+      const totalPages = Math.ceil(totalUsers / count);
+
+      const usersResult = await pool.query(
+        "SELECT * FROM users ORDER BY id ASC LIMIT $1 OFFSET $2",
+        [count, offset]
+      );
+
+      res.json({
+        success: true,
+        total_pages: totalPages,
+        total_users: totalUsers,
+        count: parseInt(count, 10),
+        page: parseInt(page, 10),
+        links: {
+          next_url:
+            page < totalPages ? `/users?page=${page + 1}&count=${count}` : null,
+          prev_url: page > 1 ? `/users?page=${page - 1}&count=${count}` : null,
+        },
+        users: usersResult.rows,
+      });
     } catch (err) {
       console.error("Error fetching users:", err);
       res.status(500).json({ error: "Internal server error" });
@@ -220,17 +241,21 @@ class UserController {
       const limit = 6; // Number of users per page
       const offset = (page - 1) * limit; // Calculate offset based on page number
 
+      // Query to get the total count of users
       const usersCountQuery = await pool.query("SELECT COUNT(*) FROM users");
       const totalCount = parseInt(usersCountQuery.rows[0].count); // Total number of users
 
-      const totalPages = Math.ceil(totalCount / limit); // Calculate total pages
+      // Calculate total pages
+      const totalPages = Math.ceil(totalCount / limit);
 
+      // Query to get users for the current page
       const usersQuery = await pool.query(
-        "SELECT * FROM users LIMIT $1 OFFSET $2",
+        "SELECT * FROM users ORDER BY id ASC LIMIT $1 OFFSET $2",
         [limit, offset]
       );
       const users = usersQuery.rows;
 
+      // Render the users and pagination details using EJS template
       res.render("index.ejs", { users, totalPages, currentPage: page });
     } catch (error) {
       console.error("Error:", error);
