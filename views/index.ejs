@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Registration</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+
+      form {
+        margin-bottom: 40px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+      }
+
+      th {
+        background-color: #f2f2f2;
+      }
+
+      img {
+        border-radius: 5px;
+        width: 100px;
+        height: 100px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>User Registration</h1>
+    <form action="/register" method="POST" enctype="multipart/form-data">
+      <label for="name">Name:</label>
+      <input type="text" name="name" id="name" /><br />
+      <label for="email">Email:</label>
+      <input type="email" name="email" id="email" /><br />
+      <label for="phone">Phone:</label>
+      <input type="text" name="phone" id="phone" /><br />
+      <label for="position">Position:</label>
+      <input type="text" name="position" id="position" /><br />
+      <label for="photo">Photo:</label>
+      <input type="file" name="photo" id="photo" /><br />
+      <label for="token">Token:</label>
+      <input type="text" name="token" id="token" /><br />
+      <button type="submit">Submit</button>
+    </form>
+    <h1>User List</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Position</th>
+          <th>Photo</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% users.forEach(user => { %>
+        <tr>
+          <td><%= user.name %></td>
+          <td><%= user.email %></td>
+          <td><%= user.phone %></td>
+          <td><%= user.position %></td>
+          <td>
+            <% if (typeof user.photo === 'string') { %> <% if
+            (user.photo.startsWith('https')) { %>
+            <img src="<%= user.photo %>" alt="Photo of <%= user.name %>" />
+            <% } else { %>
+            <img
+              src="data:image/jpeg;base64,<%= user.photo %>"
+              alt="Photo of <%= user.name %>"
+            />
+            <% } %> <% } else { %>
+            <span>No photo available</span>
+            <% } %>
+          </td>
+        </tr>
+        <% }); %>
+      </tbody>
+    </table>
+    <div class="pagination">
+      <% for (let i = 1; i <= totalPages; i++) { %>
+      <a href="/?page=<%= i %>" class="<%= i === currentPage ? 'active' : '' %>"
+        ><%= i %></a
+      >
+      <% } %>
+    </div>
+  </body>
+</html>
