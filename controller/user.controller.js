@@ -2,8 +2,11 @@ import pool from "../db.js";
 import sharp from "sharp";
 import tinify from "tinify";
 import crypto from "crypto";
+import dotenv from "dotenv";
 
-tinify.key = "hDKBJhNkQDbmDzLpkSPb1vbkrVrW5tmL";
+dotenv.config();
+
+tinify.key = TINYPNG_API_KEY;
 
 async function optimizeImage(imageBuffer) {
   try {

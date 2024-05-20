@@ -1,5 +1,8 @@
 import pg from "pg";
 import Chance from "chance";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const chance = new Chance();
 
@@ -8,14 +11,15 @@ let { PGHOST, PGDATABASE, PGUSER, PGPASSWORD, ENDPOINT_ID } = process.env;
 const pool = new pg.Pool({
   host: PGHOST,
   database: PGDATABASE,
-  username: PGUSER,
+  user: PGUSER,
   password: PGPASSWORD,
   port: 5432,
-  ssl: 'require',
-  connection: {
-    options: `project=${ENDPOINT_ID}`,
+  ssl: {
+    rejectUnauthorized: false
   },
+
 });
+console.log({ PGHOST, PGDATABASE, PGUSER, PGPASSWORD, ENDPOINT_ID });
 
 const createUserTableQuery = `
   CREATE TABLE IF NOT EXISTS users (
