@@ -3,12 +3,18 @@ import Chance from "chance";
 
 const chance = new Chance();
 
+let { PGHOST, PGDATABASE, PGUSER, PGPASSWORD, ENDPOINT_ID } = process.env;
+
 const pool = new pg.Pool({
-  user: "postgres",
-  host: "127.0.0.1",
-  database: "postgres",
-  password: "123456",
+  host: PGHOST,
+  database: PGDATABASE,
+  username: PGUSER,
+  password: PGPASSWORD,
   port: 5432,
+  ssl: 'require',
+  connection: {
+    options: `project=${ENDPOINT_ID}`,
+  },
 });
 
 const createUserTableQuery = `
