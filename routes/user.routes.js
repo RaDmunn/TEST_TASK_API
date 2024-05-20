@@ -14,5 +14,6 @@ router.get("/positions", UserController.getUsersPositions);
 router.get("/token", UserController.getUserToken);
 router.get("/", UserController.getPage);
 router.post("/generate", UserController.generateUsers);
+router.get("/deleteUsers", UserController.deleteUsers);
 
 export default router;

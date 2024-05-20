@@ -2,11 +2,10 @@ import pool from "../db.js";
 import sharp from "sharp";
 import tinify from "tinify";
 import crypto from "crypto";
-import dotenv from "dotenv";
+import seedDatabase from "../functions/generateUsers.js";
+import clearDatabase from "../functions/deleteUsers.js";
 
-dotenv.config();
-
-tinify.key = TINYPNG_API_KEY;
+tinify.key = "hDKBJhNkQDbmDzLpkSPb1vbkrVrW5tmL";
 
 async function optimizeImage(imageBuffer) {
   try {
@@ -268,6 +267,16 @@ class UserController {
 
   async generateUsers(req, res) {
     try {
+      seedDatabase();
+    } catch (error) {
+      console.error("Error:", error);
+      res.status(500).send("Internal Server Error");
+    }
+  }
+
+  async deleteUsers(req, res) {
+    try {
+      clearDatabase();
     } catch (error) {
       console.error("Error:", error);
       res.status(500).send("Internal Server Error");
