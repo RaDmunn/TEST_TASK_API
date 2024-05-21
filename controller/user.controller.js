@@ -20,7 +20,7 @@ async function optimizeImage(imageBuffer) {
 class UserController {
   async createUser(req, res) {
     try {
-      const { name, email, phone, position } = req.body;
+      const { name, email, phone, position, token } = req.body;
       const photo = req.file;
 
       // Validate input fields
@@ -58,12 +58,12 @@ class UserController {
         });
       }
 
-      if (!String.isInteger(parseInt(position))) {
+      if (!(typeof position === "string")) {
         return res.status(422).json({
           success: false,
           message: "Validation failed",
           fails: {
-            position_id: ["The position id must be a string."],
+            position_id: ["The position must be a string."],
           },
         });
       }
@@ -96,6 +96,16 @@ class UserController {
           message: "Validation failed",
           fails: {
             photo: ["The photo size must not exceed 5 MB."],
+          },
+        });
+      }
+
+      if (!token) {
+        return res.status(422).json({
+          success: false,
+          message: "Validation failed",
+          fails: {
+            photo: ["The token field is required."],
           },
         });
       }
@@ -138,7 +148,7 @@ class UserController {
       });
     } catch (err) {
       console.error("Error:", err);
-      if (err instanceof ValidationError) {
+      if (err) {
         res.status(422).json({
           success: false,
           message: "Validation failed",
